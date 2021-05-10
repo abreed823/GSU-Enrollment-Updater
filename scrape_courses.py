@@ -7,11 +7,10 @@ from itertools import chain
 
 # -TO DO-
 # Add proper formatting (i.e. cell outlines, titles, legends, etc.)
-# Get proper page spacing
-# Change .font for multiple rows at once
 # For long last name on ALP, make it split into two lines at first initial if it exceeds a certain # of characters
 # Issue - if internet goes out during scrape, file is corrupt
 # Figure out page breaks
+# Tag campuses and left align after full center align
 
 
 class Courses:
@@ -20,12 +19,12 @@ class Courses:
     new_sheet = None
 
     # Declares starting rows for each campus
-    alp_row = 4
-    clk_row = 34
-    dec_row = 64
-    dun_row = 94
-    newt_row = 124
-    onl_row = 154
+    alp_row = 5
+    clk_row = 44
+    dec_row = 82
+    dun_row = 120
+    newt_row = 160
+    onl_row = 199
 
     # Defines column of each piece of data in data frame
     col_crn = 2
@@ -65,9 +64,37 @@ class Courses:
         self.new_sheet.column_dimensions['K'].width = 9.83
         self.new_sheet.column_dimensions['L'].width = 17
 
-        # col_break = ColBreak(brk=13)
-        # self.new_sheet.page_breaks = col_break
+        # list(chain(range(1, 5), range(40, 44), range(78, 82), range(116, 120), range(156, 160), range(195, 199)))
+        # Appends proper headings to each campus
+        for row in [1, 40, 78, 116, 156, 195]:
+            self.new_sheet.cell(row=row, column=6, value='Perimeter College')
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
+            row += 1
 
+            self.new_sheet.cell(row=row, column=6, value='HONORS COLLEGE COURSES')
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
+            row += 1
+
+            year = date.today().year
+            if date.today().month >= 2 or date.today().month <= 8:
+                semester = 'FALL'
+            else:
+                semester = 'SPRING'
+
+            self.new_sheet.cell(row=row, column=6, value=f'{semester} Semester {year}')
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
+
+            self.new_sheet.cell(row=row, column=11, value=f"Updated {date.today().strftime('%m/%d/%Y')}")
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=11, end_column=12)
+
+        self.new_sheet.cell(row=4, column=2, value='ALPHARETTA CAMPUS')
+        self.new_sheet.cell(row=43, column=2, value='CLARKSTON CAMPUS')
+        self.new_sheet.cell(row=81, column=2, value='DECATUR CAMPUS')
+        self.new_sheet.cell(row=119, column=2, value='DUNWOODY CAMPUS')
+        self.new_sheet.cell(row=159, column=2, value='NEWTON CAMPUS')
+        self.new_sheet.cell(row=198, column=2, value='ONLINE CAMPUS')
+        for row in (4, 43, 81, 119, 159, 198):
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=4)
 
     # Checks each row to make sure it has class data
     def row_has_class(self, crn):
@@ -76,25 +103,26 @@ class Courses:
     # Adds data to spreadsheet
     def add_data(self, crn, subj, class_name, sec, class_credits, title, days, class_time, cap, act, comments, prof,
                  location, row_type):
+
         self.new_sheet.cell(row=row_type, column=2, value=crn)
-        self.new_sheet.cell(row=row_type, column=3, value=subj).font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=3, value=subj)
         if cap < 19 and cap != 9 and 'MultiCast' not in comments:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*').font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
         elif 'MultiCast' in comments:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+').font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+')
         else:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}').font = Font(size=9)
-        self.new_sheet.cell(row=row_type, column=5, value=class_credits).font = Font(size=9)
-        self.new_sheet.cell(row=row_type, column=6, value=title.upper()).font = Font(size=8)
-        self.new_sheet.cell(row=row_type, column=7, value=days).font = Font(size=9)
-        self.new_sheet.cell(row=row_type, column=8, value=class_time.upper()).font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
+        self.new_sheet.cell(row=row_type, column=5, value=class_credits)
+        self.new_sheet.cell(row=row_type, column=6, value=title.upper())
+        self.new_sheet.cell(row=row_type, column=7, value=days)
+        self.new_sheet.cell(row=row_type, column=8, value=class_time.upper())
         if act != 0:
-            self.new_sheet.cell(row=row_type, column=9, value=act).font = Font(size=9)
-        self.new_sheet.cell(row=row_type, column=10, value=cap).font = Font(size=9)
-        self.new_sheet.cell(row=row_type, column=11, value=location).font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=9, value=act)
+        self.new_sheet.cell(row=row_type, column=10, value=cap)
+        self.new_sheet.cell(row=row_type, column=11, value=location)
 
         if prof == 'TBA':
-            self.new_sheet.cell(row=row_type, column=12, value='STAFF').font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=12, value='STAFF')
         else:
             original_name = prof.split(' ')
             first_initial = original_name[0][0]
@@ -105,7 +133,7 @@ class Courses:
                 hyphenated_name = last_name.split('-')
                 last_name = hyphenated_name[-1]
             formatted_name = f'{first_initial}. {last_name}'
-            self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper()).font = Font(size=9)
+            self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper())
 
         # The faster less brute-force version if I can get it to work
         # I need it to be able to add the list of values to specific rows, not just to the end of the sheet
@@ -208,10 +236,10 @@ class Courses:
                 self.new_sheet[coordinate].alignment = Alignment(horizontal='center')
 
         # # Sets size for specific cells in sheet all at once
-        # for row in chain(range(5, 26)), range(35, 60):
-        #     for column in chain(range(3, 6), range(7, 13)):
-        #         coordinate = self.new_sheet.cell(row=row, column=column).coordinate
-        #         self.new_sheet[coordinate].font = Font(name='Arial', size=9)
+        for row in list(chain(range(5, 26), range(35, 60))):
+            for column in list(chain(range(3, 6), range(7, 13))):
+                coordinate = self.new_sheet.cell(row=row, column=column).coordinate
+                self.new_sheet[coordinate].font = Font(name='Arial', size=9)
 
         self.book.save('Fall Schedule March 25th copy.xlsx')
 
