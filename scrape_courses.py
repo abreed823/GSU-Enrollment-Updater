@@ -1,36 +1,23 @@
 import pandas as pd
 from openpyxl import load_workbook
+from openpyxl.styles import Alignment, Font
+from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
 from datetime import date
+from itertools import chain
 
 # -TO DO-
-# Distinguish multicast from embedded
-# Figure out cell width
-# Center text in cells
 # Add proper formatting (i.e. cell outlines, titles, legends, etc.)
 # Get proper page spacing
+# Change .font for multiple rows at once
+# For long last name on ALP, make it split into two lines at first initial if it exceeds a certain # of characters
+# Issue - if internet goes out during scrape, file is corrupt
+# Figure out page breaks
 
 
 class Courses:
-    # Creates new sheet
-    today = date.today().strftime('%m-%d-%Y')
-    book = load_workbook('Fall Schedule March 25th copy.xlsx')
-    book.create_sheet('NEW TEST SHEET ' + today)
-    book.save('Fall Schedule March 25th copy.xlsx')
-    new_sheet = book.worksheets[-1]
-
-    # Sets sheet column widths
-    new_sheet.column_dimensions['A'].width = 5
-    new_sheet.column_dimensions['B'].width = 6
-    new_sheet.column_dimensions['C'].width = 5.17
-    new_sheet.column_dimensions['D'].width = 9.67
-    new_sheet.column_dimensions['E'].width = 8.67
-    new_sheet.column_dimensions['F'].width = 29.17
-    new_sheet.column_dimensions['G'].width = 4.67
-    new_sheet.column_dimensions['H'].width = 17.67
-    new_sheet.column_dimensions['I'].width = 4.67
-    new_sheet.column_dimensions['J'].width = 5.67
-    new_sheet.column_dimensions['K'].width = 9
-    new_sheet.column_dimensions['L'].width = 16.17
+    today = None
+    book = None
+    new_sheet = None
 
     # Declares starting rows for each campus
     alp_row = 4
@@ -52,31 +39,62 @@ class Courses:
     col_time = 10
     col_cap = 11
     col_act = 12
+    col_comments = 17
     col_prof = 18
     col_location = 20
 
+    def create_new_sheet(self):
+        # Creates new sheet
+        self.today = date.today().strftime('%m-%d-%Y')
+        self.book = load_workbook('Fall Schedule March 25th copy.xlsx')
+        self.book.create_sheet('NEW TEST SHEET ' + self.today)
+        self.book.save('Fall Schedule March 25th copy.xlsx')
+        self.new_sheet = self.book.worksheets[-1]
+
+        # Sets sheet column widths
+        self.new_sheet.column_dimensions['A'].width = 5.83
+        self.new_sheet.column_dimensions['B'].width = 6.83
+        self.new_sheet.column_dimensions['C'].width = 6
+        self.new_sheet.column_dimensions['D'].width = 10.5
+        self.new_sheet.column_dimensions['E'].width = 9.5
+        self.new_sheet.column_dimensions['F'].width = 30
+        self.new_sheet.column_dimensions['G'].width = 5.5
+        self.new_sheet.column_dimensions['H'].width = 18.5
+        self.new_sheet.column_dimensions['I'].width = 5.5
+        self.new_sheet.column_dimensions['J'].width = 6.5
+        self.new_sheet.column_dimensions['K'].width = 9.83
+        self.new_sheet.column_dimensions['L'].width = 17
+
+        # col_break = ColBreak(brk=13)
+        # self.new_sheet.page_breaks = col_break
+
+
+    # Checks each row to make sure it has class data
     def row_has_class(self, crn):
         return any(char.isdigit() for char in crn)
 
-    def add_data(self, crn, subj, class_name, sec, class_credits, title, days, class_time, cap, act, prof,
+    # Adds data to spreadsheet
+    def add_data(self, crn, subj, class_name, sec, class_credits, title, days, class_time, cap, act, comments, prof,
                  location, row_type):
         self.new_sheet.cell(row=row_type, column=2, value=crn)
-        self.new_sheet.cell(row=row_type, column=3, value=subj)
-        if cap < 19:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
+        self.new_sheet.cell(row=row_type, column=3, value=subj).font = Font(size=9)
+        if cap < 19 and cap != 9 and 'MultiCast' not in comments:
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*').font = Font(size=9)
+        elif 'MultiCast' in comments:
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+').font = Font(size=9)
         else:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
-        self.new_sheet.cell(row=row_type, column=5, value=class_credits)
-        self.new_sheet.cell(row=row_type, column=6, value=title.upper())
-        self.new_sheet.cell(row=row_type, column=7, value=days)
-        self.new_sheet.cell(row=row_type, column=8, value=class_time.upper())
+            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}').font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=5, value=class_credits).font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=6, value=title.upper()).font = Font(size=8)
+        self.new_sheet.cell(row=row_type, column=7, value=days).font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=8, value=class_time.upper()).font = Font(size=9)
         if act != 0:
-            self.new_sheet.cell(row=row_type, column=9, value=act)
-        self.new_sheet.cell(row=row_type, column=10, value=cap)
-        self.new_sheet.cell(row=row_type, column=11, value=location)
+            self.new_sheet.cell(row=row_type, column=9, value=act).font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=10, value=cap).font = Font(size=9)
+        self.new_sheet.cell(row=row_type, column=11, value=location).font = Font(size=9)
 
         if prof == 'TBA':
-            self.new_sheet.cell(row=row_type, column=12, value='STAFF')
+            self.new_sheet.cell(row=row_type, column=12, value='STAFF').font = Font(size=9)
         else:
             original_name = prof.split(' ')
             first_initial = original_name[0][0]
@@ -87,7 +105,7 @@ class Courses:
                 hyphenated_name = last_name.split('-')
                 last_name = hyphenated_name[-1]
             formatted_name = f'{first_initial}. {last_name}'
-            self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper())
+            self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper()).font = Font(size=9)
 
         # The faster less brute-force version if I can get it to work
         # I need it to be able to add the list of values to specific rows, not just to the end of the sheet
@@ -99,7 +117,9 @@ class Courses:
         # Testing purposes only
         # print(f'{crn} {subj} {class_name} {sec} {campus} {class_credits} {title} {days} {class_time} {cap} {act} {prof} {location}')
 
+    # Creates data frame and pushes df data to add_data method
     def create_data_frame(self, html_source):
+        self.create_new_sheet()
         # Pulls second to last table from site
         # 'header=0' allows my to properly label each column
         df = pd.read_html(html_source, header=0)[-2]
@@ -117,10 +137,9 @@ class Courses:
                 class_time = df.iat[i, self.col_time]
                 cap = df.iat[i, self.col_cap]
                 act = df.iat[i, self.col_act]
+                comments = df.iat[i, self.col_comments]
                 prof = df.iat[i, self.col_prof]
                 location = df.iat[i, self.col_location]
-
-                # room_number = [i for i in location.split() if i.isdigit()][0]
 
                 if 'Alpharetta' in campus:
                     self.alp_row += 1
@@ -176,10 +195,24 @@ class Courses:
                     row_type = self.onl_row
 
                 self.add_data(int(crn), subj, class_name, sec, int(float(class_credits)), title, days, class_time,
-                              int(cap), int(act), prof,
+                              int(cap), int(act), comments, prof,
                               location, row_type)
             else:
                 print(f'I am not a row. Index: {i}')
+
+        # Sets alignment for every cell after sheet is created all at once
+        for row in range(self.new_sheet.min_row, self.new_sheet.max_row + 1):
+            self.new_sheet.row_dimensions[row].height = 14.25
+            for column in range(self.new_sheet.min_column, self.new_sheet.max_column + 1):
+                coordinate = self.new_sheet.cell(row=row, column=column).coordinate
+                self.new_sheet[coordinate].alignment = Alignment(horizontal='center')
+
+        # # Sets size for specific cells in sheet all at once
+        # for row in chain(range(5, 26)), range(35, 60):
+        #     for column in chain(range(3, 6), range(7, 13)):
+        #         coordinate = self.new_sheet.cell(row=row, column=column).coordinate
+        #         self.new_sheet[coordinate].font = Font(name='Arial', size=9)
+
         self.book.save('Fall Schedule March 25th copy.xlsx')
 
         # ***** The slow version of the above code *****
