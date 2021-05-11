@@ -20,11 +20,11 @@ class Courses:
 
     # Declares starting rows for each campus
     alp_row = 5
-    clk_row = 44
-    dec_row = 82
-    dun_row = 120
-    newt_row = 160
-    onl_row = 199
+    clk_row = 42
+    dec_row = 80
+    dun_row = 118
+    newt_row = 156
+    onl_row = 195
 
     # Defines column of each piece of data in data frame
     col_crn = 2
@@ -66,12 +66,12 @@ class Courses:
 
         # list(chain(range(1, 5), range(40, 44), range(78, 82), range(116, 120), range(156, 160), range(195, 199)))
         # Appends proper headings to each campus
-        for row in [1, 40, 78, 116, 156, 195]:
-            self.new_sheet.cell(row=row, column=6, value='Perimeter College')
+        for row in [1, 38, 76, 114, 152, 191]:
+            self.new_sheet.cell(row=row, column=6, value='Perimeter College').font = Font(bold=True)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
             row += 1
 
-            self.new_sheet.cell(row=row, column=6, value='HONORS COLLEGE COURSES')
+            self.new_sheet.cell(row=row, column=6, value='HONORS COLLEGE COURSES').font = Font(bold=True)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
             row += 1
 
@@ -81,19 +81,34 @@ class Courses:
             else:
                 semester = 'SPRING'
 
-            self.new_sheet.cell(row=row, column=6, value=f'{semester} Semester {year}')
+            self.new_sheet.cell(row=row, column=6, value=f'{semester} Semester {year}').font = Font(bold=True)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
 
-            self.new_sheet.cell(row=row, column=11, value=f"Updated {date.today().strftime('%m/%d/%Y')}")
+            self.new_sheet.cell(row=row, column=11, value=f"Updated {date.today().strftime('%m/%d/%Y')}").font = Font(size=9)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=11, end_column=12)
 
-        self.new_sheet.cell(row=4, column=2, value='ALPHARETTA CAMPUS')
-        self.new_sheet.cell(row=43, column=2, value='CLARKSTON CAMPUS')
-        self.new_sheet.cell(row=81, column=2, value='DECATUR CAMPUS')
-        self.new_sheet.cell(row=119, column=2, value='DUNWOODY CAMPUS')
-        self.new_sheet.cell(row=159, column=2, value='NEWTON CAMPUS')
-        self.new_sheet.cell(row=198, column=2, value='ONLINE CAMPUS')
-        for row in (4, 43, 81, 119, 159, 198):
+        # Table headers
+        for row in [5, 42, 80, 118, 156, 195]:
+            self.new_sheet.cell(row=row, column=2, value='CRN').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=3, value='COURSE ID').font = Font(size=9, bold=True)
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=3, end_column=4)
+            self.new_sheet.cell(row=row, column=5, value='CREDITS').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=6, value='COURSE NAME').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=7, value='DAY').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=8, value='TIME').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=9, value='ACT').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=10, value='CAP').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=11, value='ROOM').font = Font(size=9, bold=True)
+            self.new_sheet.cell(row=row, column=12, value='FACULTY').font = Font(size=9, bold=True)
+
+        # Adds campus names to sheet
+        self.new_sheet.cell(row=4, column=2, value='ALPHARETTA CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=41, column=2, value='CLARKSTON CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=79, column=2, value='DECATUR CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=117, column=2, value='DUNWOODY CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=155, column=2, value='NEWTON CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=194, column=2, value='ONLINE CAMPUS').font = Font(size=9, bold=True)
+        for row in (4, 41, 79, 117, 155, 194):
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=4)
 
     # Checks each row to make sure it has class data
@@ -106,16 +121,19 @@ class Courses:
 
         self.new_sheet.cell(row=row_type, column=2, value=crn)
         self.new_sheet.cell(row=row_type, column=3, value=subj)
+
         if cap < 19 and cap != 9 and 'MultiCast' not in comments:
             self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
         elif 'MultiCast' in comments:
             self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+')
         else:
             self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
+
         self.new_sheet.cell(row=row_type, column=5, value=class_credits)
         self.new_sheet.cell(row=row_type, column=6, value=title.upper())
         self.new_sheet.cell(row=row_type, column=7, value=days)
         self.new_sheet.cell(row=row_type, column=8, value=class_time.upper())
+
         if act != 0:
             self.new_sheet.cell(row=row_type, column=9, value=act)
         self.new_sheet.cell(row=row_type, column=10, value=cap)
@@ -142,9 +160,6 @@ class Courses:
         # self.row += 1
         # print('Row constructed successfully!')
 
-        # Testing purposes only
-        # print(f'{crn} {subj} {class_name} {sec} {campus} {class_credits} {title} {days} {class_time} {cap} {act} {prof} {location}')
-
     # Creates data frame and pushes df data to add_data method
     def create_data_frame(self, html_source):
         self.create_new_sheet()
@@ -169,62 +184,65 @@ class Courses:
                 prof = df.iat[i, self.col_prof]
                 location = df.iat[i, self.col_location]
 
-                if 'Alpharetta' in campus:
-                    self.alp_row += 1
-                    row_type = self.alp_row
-                    room_number = [i for i in location.split() if i.isdigit()][0]
+                if int(cap) > 0:
+                    if 'Alpharetta' in campus:
+                        self.alp_row += 1
+                        row_type = self.alp_row
+                        room_number = [i for i in location.split() if i.isdigit()][0]
 
-                    if 'Bldg A' in location:
-                        location = f'AA {room_number}'
-                    else:
-                        location = f'AB {room_number}'
-                elif 'Clarkston' in campus:
-                    self.clk_row += 1
-                    row_type = self.clk_row
-                    room_number = [i for i in location.split() if i.isdigit()][0]
+                        if 'Bldg A' in location:
+                            location = f'AA {room_number}'
+                        else:
+                            location = f'AB {room_number}'
+                    elif 'Clarkston' in campus:
+                        self.clk_row += 1
+                        row_type = self.clk_row
+                        room_number = [i for i in location.split() if i.isdigit()][0]
 
-                    if 'Bldg B' in location:
-                        location = f'CB {room_number}'
-                    elif 'Bldg C' in location:
-                        location = f'CC {room_number}'
-                    elif 'Bldg D' in location:
-                        location = f'CD {room_number}'
-                    elif 'Bldg E' in location:
-                        location = f'CE {room_number}'
-                    else:
-                        location = f'CH {room_number}'
-                elif 'Decatur' in campus:
-                    self.dec_row += 1
-                    row_type = self.dec_row
-                    room_number = [i for i in location.split() if i.isdigit()][0]
+                        if 'Bldg B' in location:
+                            location = f'CB {room_number}'
+                        elif 'Bldg C' in location:
+                            location = f'CC {room_number}'
+                        elif 'Bldg D' in location:
+                            location = f'CD {room_number}'
+                        elif 'Bldg E' in location:
+                            location = f'CE {room_number}'
+                        else:
+                            location = f'CH {room_number}'
+                    elif 'Decatur' in campus:
+                        self.dec_row += 1
+                        row_type = self.dec_row
+                        room_number = [i for i in location.split() if i.isdigit()][0]
 
-                    if 'Bldg. SB' in location:
-                        location = f'SB {room_number}'
-                    else:
-                        location = f'SC {room_number}'
-                elif 'Dunwoody' in campus:
-                    self.dun_row += 1
-                    row_type = self.dun_row
-                    room_number = [i for i in location.split() if i.isdigit()][0]
+                        if 'Bldg. SB' in location:
+                            location = f'SB {room_number}'
+                        else:
+                            location = f'SC {room_number}'
+                    elif 'Dunwoody' in campus:
+                        self.dun_row += 1
+                        row_type = self.dun_row
+                        room_number = [i for i in location.split() if i.isdigit()][0]
 
-                    if 'Classroom' in location:
-                        location = f'E {room_number}'
-                    elif 'Science' in location:
-                        location = f'C {room_number}'
+                        if 'Classroom' in location:
+                            location = f'E {room_number}'
+                        elif 'Science' in location:
+                            location = f'C {room_number}'
+                        else:
+                            location = f'A {room_number}'
+                    elif 'Newton' in campus:
+                        self.newt_row += 1
+                        row_type = self.newt_row
+                        room_number = [i for i in location.split() if i.isdigit()][0]
+                        location = f'1N {room_number}'
                     else:
-                        location = f'A {room_number}'
-                elif 'Newton' in campus:
-                    self.newt_row += 1
-                    row_type = self.newt_row
-                    room_number = [i for i in location.split() if i.isdigit()][0]
-                    location = f'1N {room_number}'
+                        self.onl_row += 1
+                        row_type = self.onl_row
+                    print(f'Success: Index: {i}')
+                    self.add_data(int(crn), subj, class_name, sec, int(float(class_credits)), title, days, class_time,
+                                  int(cap), int(act), comments, prof,
+                                  location, row_type)
                 else:
-                    self.onl_row += 1
-                    row_type = self.onl_row
-
-                self.add_data(int(crn), subj, class_name, sec, int(float(class_credits)), title, days, class_time,
-                              int(cap), int(act), comments, prof,
-                              location, row_type)
+                    print(f'Error: Class not found. Index: {i}')
             else:
                 print(f'I am not a row. Index: {i}')
 
@@ -235,37 +253,18 @@ class Courses:
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
                 self.new_sheet[coordinate].alignment = Alignment(horizontal='center')
 
-        # # Sets size for specific cells in sheet all at once
-        for row in list(chain(range(5, 26), range(35, 60))):
+        # Sets size for specific cells in sheet all at once
+        # TODO finish this and adjust range
+        for row in list(chain(range(6, self.alp_row + 1), range(43, self.clk_row + 1), range(81, self.dec_row + 1),
+                              range(119, self.dun_row + 1), range(157, self.newt_row + 1), range(196, self.onl_row + 1))):
+            coordinate = self.new_sheet.cell(row=row, column=6).coordinate
+            self.new_sheet[coordinate].font = Font(name='Arial', size=8)
+
             for column in list(chain(range(3, 6), range(7, 13))):
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
                 self.new_sheet[coordinate].font = Font(name='Arial', size=9)
 
         self.book.save('Fall Schedule March 25th copy.xlsx')
-
-        # ***** The slow version of the above code *****
-        # for i in df.index:
-        #     if self.row_has_class(df[col_crn].iloc[i]):
-        #         # print('I am a row')
-        #         crn = df[col_crn].iloc[i]
-        #         subj = df[col_subj].iloc[i]
-        #         class_name = df[col_class].iloc[i]
-        #         sec = df[col_sec].iloc[i]
-        #         campus = df[col_campus].iloc[i]
-        #         class_credits = df[col_credits].iloc[i]
-        #         title = df[col_title].iloc[i]
-        #         days = df[col_days].iloc[i]
-        #         class_time = df[col_time].iloc[i]
-        #         cap = df[col_cap].iloc[i]
-        #         act = df[col_act].iloc[i]
-        #         prof = df[col_prof].iloc[i]
-        #         location = df[col_location].iloc[i]
-        #         self.add_data(crn, subj, class_name, sec, campus, class_credits, title, days, class_time, cap, act,
-        #                       prof, location)
-        #     else:
-        #         print(f'I am not a row. Index: {i}')
-        #     if i == 15:
-        #         break
 
         # *****NOTE - DO NOT DELETE***** This block of code puts data frame into sheet.
         # This does not need to happen every time I run the program while testing, so it is commented out
