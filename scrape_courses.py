@@ -1,11 +1,11 @@
 import pandas as pd
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment, Font
+from openpyxl.styles import Alignment, Font, Border, Side
 from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
 from datetime import date
 from itertools import chain
 
-# -TO DO-
+# -TODO-
 # Add proper formatting (i.e. cell outlines, titles, legends, etc.)
 # For long last name on ALP, make it split into two lines at first initial if it exceeds a certain # of characters
 # Issue - if internet goes out during scrape, file is corrupt
@@ -17,6 +17,7 @@ class Courses:
     today = None
     book = None
     new_sheet = None
+    cell_border = None
 
     # Declares starting rows for each campus
     alp_row = 5
@@ -89,17 +90,25 @@ class Courses:
 
         # Table headers
         for row in [5, 42, 80, 118, 156, 195]:
+
             self.new_sheet.cell(row=row, column=2, value='CRN').font = Font(size=9, bold=True)
             self.new_sheet.cell(row=row, column=3, value='COURSE ID').font = Font(size=9, bold=True)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=3, end_column=4)
             self.new_sheet.cell(row=row, column=5, value='CREDITS').font = Font(size=9, bold=True)
             self.new_sheet.cell(row=row, column=6, value='COURSE NAME').font = Font(size=9, bold=True)
             self.new_sheet.cell(row=row, column=7, value='DAY').font = Font(size=9, bold=True)
-            self.new_sheet.cell(row=row, column=8, value='TIME').font = Font(size=9, bold=True)
-            self.new_sheet.cell(row=row, column=9, value='ACT').font = Font(size=9, bold=True)
-            self.new_sheet.cell(row=row, column=10, value='CAP').font = Font(size=9, bold=True)
-            self.new_sheet.cell(row=row, column=11, value='ROOM').font = Font(size=9, bold=True)
-            self.new_sheet.cell(row=row, column=12, value='FACULTY').font = Font(size=9, bold=True)
+
+            # Makes the headers appropriately different for the Online Campus
+            if row != 195:
+                self.new_sheet.cell(row=row, column=8, value='TIME').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=9, value='ACT').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=10, value='CAP').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=11, value='ROOM').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=12, value='FACULTY').font = Font(size=9, bold=True)
+            else:
+                self.new_sheet.cell(row=row, column=8, value='FACULTY').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=9, value='ACT').font = Font(size=9, bold=True)
+                self.new_sheet.cell(row=row, column=10, value='CAP').font = Font(size=9, bold=True)
 
         # Adds campus names to sheet
         self.new_sheet.cell(row=4, column=2, value='ALPHARETTA CAMPUS').font = Font(size=9, bold=True)
@@ -117,41 +126,75 @@ class Courses:
 
     # Adds data to spreadsheet
     def add_data(self, crn, subj, class_name, sec, class_credits, title, days, class_time, cap, act, comments, prof,
-                 location, row_type):
+                 location, row_type, campus):
 
-        self.new_sheet.cell(row=row_type, column=2, value=crn)
-        self.new_sheet.cell(row=row_type, column=3, value=subj)
+        # Online classes are formatted differently from all other classes
+        if 'Online' not in campus:
+            self.new_sheet.cell(row=row_type, column=2, value=crn)
+            self.new_sheet.cell(row=row_type, column=3, value=subj)
 
-        if cap < 19 and cap != 9 and 'MultiCast' not in comments:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
-        elif 'MultiCast' in comments:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+')
+            if cap < 19 and cap != 9 and 'MultiCast' not in comments:
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
+            elif 'MultiCast' in comments:
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+')
+            else:
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
+
+            self.new_sheet.cell(row=row_type, column=5, value=class_credits)
+            self.new_sheet.cell(row=row_type, column=6, value=title.upper())
+            self.new_sheet.cell(row=row_type, column=7, value=days)
+            self.new_sheet.cell(row=row_type, column=8, value=class_time.upper())
+
+            if act != 0:
+                self.new_sheet.cell(row=row_type, column=9, value=act)
+            self.new_sheet.cell(row=row_type, column=10, value=cap)
+            self.new_sheet.cell(row=row_type, column=11, value=location)
+
+            if prof == 'TBA':
+                self.new_sheet.cell(row=row_type, column=12, value='STAFF')
+            else:
+                original_name = prof.split(' ')
+                first_initial = original_name[0][0]
+                last_name = original_name[-1]
+                # Maybe try this with list comprehension???
+                if '-' in last_name:
+                    # Maybe try combining these two statements???
+                    hyphenated_name = last_name.split('-')
+                    last_name = hyphenated_name[-1]
+                formatted_name = f'{first_initial}. {last_name}'
+                self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper())
+
+        # Formatting for Online classes
         else:
-            self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
+            self.new_sheet.cell(row=row_type, column=2, value=crn)
+            self.new_sheet.cell(row=row_type, column=3, value=subj)
 
-        self.new_sheet.cell(row=row_type, column=5, value=class_credits)
-        self.new_sheet.cell(row=row_type, column=6, value=title.upper())
-        self.new_sheet.cell(row=row_type, column=7, value=days)
-        self.new_sheet.cell(row=row_type, column=8, value=class_time.upper())
+            if cap < 19 and cap != 9:
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
+            else:
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
 
-        if act != 0:
-            self.new_sheet.cell(row=row_type, column=9, value=act)
-        self.new_sheet.cell(row=row_type, column=10, value=cap)
-        self.new_sheet.cell(row=row_type, column=11, value=location)
+            self.new_sheet.cell(row=row_type, column=5, value=class_credits)
+            self.new_sheet.cell(row=row_type, column=6, value=title.upper())
+            self.new_sheet.cell(row=row_type, column=7, value='')
 
-        if prof == 'TBA':
-            self.new_sheet.cell(row=row_type, column=12, value='STAFF')
-        else:
-            original_name = prof.split(' ')
-            first_initial = original_name[0][0]
-            last_name = original_name[-1]
-            # Maybe try this with list comprehension???
-            if '-' in last_name:
-                # Maybe try combining these two statements???
-                hyphenated_name = last_name.split('-')
-                last_name = hyphenated_name[-1]
-            formatted_name = f'{first_initial}. {last_name}'
-            self.new_sheet.cell(row=row_type, column=12, value=formatted_name[0:-4].upper())
+            if act != 0:
+                self.new_sheet.cell(row=row_type, column=9, value=act)
+            self.new_sheet.cell(row=row_type, column=10, value=cap)
+
+            if prof == 'TBA':
+                self.new_sheet.cell(row=row_type, column=8, value='STAFF')
+            else:
+                original_name = prof.split(' ')
+                first_initial = original_name[0][0]
+                last_name = original_name[-1]
+                # Maybe try this with list comprehension???
+                if '-' in last_name:
+                    # Maybe try combining these two statements???
+                    hyphenated_name = last_name.split('-')
+                    last_name = hyphenated_name[-1]
+                formatted_name = f'{first_initial}. {last_name}'
+                self.new_sheet.cell(row=row_type, column=8, value=formatted_name[0:-4].upper())
 
         # The faster less brute-force version if I can get it to work
         # I need it to be able to add the list of values to specific rows, not just to the end of the sheet
@@ -240,21 +283,20 @@ class Courses:
                     print(f'Success: Index: {i}')
                     self.add_data(int(crn), subj, class_name, sec, int(float(class_credits)), title, days, class_time,
                                   int(cap), int(act), comments, prof,
-                                  location, row_type)
+                                  location, row_type, campus)
                 else:
                     print(f'Error: Class not found. Index: {i}')
             else:
                 print(f'I am not a row. Index: {i}')
 
         # Sets alignment for every cell after sheet is created all at once
-        for row in range(self.new_sheet.min_row, self.new_sheet.max_row + 1):
+        for row in range(self.new_sheet.min_row, self.new_sheet.max_row + 8):
             self.new_sheet.row_dimensions[row].height = 14.25
             for column in range(self.new_sheet.min_column, self.new_sheet.max_column + 1):
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
                 self.new_sheet[coordinate].alignment = Alignment(horizontal='center')
 
         # Sets size for specific cells in sheet all at once
-        # TODO finish this and adjust range
         for row in list(chain(range(6, self.alp_row + 1), range(43, self.clk_row + 1), range(81, self.dec_row + 1),
                               range(119, self.dun_row + 1), range(157, self.newt_row + 1), range(196, self.onl_row + 1))):
             coordinate = self.new_sheet.cell(row=row, column=6).coordinate
@@ -263,6 +305,106 @@ class Courses:
             for column in list(chain(range(3, 6), range(7, 13))):
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
                 self.new_sheet[coordinate].font = Font(name='Arial', size=9)
+
+        # Sets borders for all cells in tables
+        for row in list(chain(range(5, self.alp_row + 1), range(42, self.clk_row + 1), range(80, self.dec_row + 1),
+                              range(118, self.dun_row + 1), range(156, self.newt_row + 1), range(195, self.onl_row + 1))):
+            if row < 195:
+                max_column = self.new_sheet.max_column + 1
+            else:
+                max_column = self.new_sheet.max_column - 1
+            for column in range(self.new_sheet.min_column, max_column):
+                coordinate = self.new_sheet.cell(row=row, column=column).coordinate
+                self.new_sheet[coordinate].border = Border(left=Side(style='thin'), right=Side(style='thin'),
+                                                           top=Side(style='thin'), bottom=Side(style='thin'))
+
+        # List of header rows
+        header_rows = [5, 42, 80, 118, 156, 195]
+        for row in header_rows:
+            for column in range(self.new_sheet.min_column, self.new_sheet.max_column + 1):
+                self.new_sheet.row_dimensions[row].height = 21
+
+        footer_tables = [self.alp_row + 2, self.clk_row + 2, self.dec_row + 2, self.dun_row + 2, self. newt_row + 2,
+                         self.onl_row + 2]
+
+        for row in footer_tables:
+            self.new_sheet.cell(row=row, column=2, value=f'Course ID Legend').border = Border(left=Side(style='thick'),
+                                                                                              right=Side(style='thick'),
+                                                                                              top=Side(style='thick'),
+                                                                                              bottom=Side(style='thick'))
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
+            self.new_sheet.cell(row=row, column=6, value=f'Host Campus for Multicast Courses').border = Border(left=Side(style='thick'),
+                                                                                              right=Side(style='thick'),
+                                                                                              top=Side(style='thick'),
+                                                                                              bottom=Side(style='thick'))
+            row += 1
+
+            self.new_sheet.cell(row=row, column=2, value=f'* = Embedded honors class').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
+            self.new_sheet.cell(row=row, column=6, value=f'α = Alpharetta').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            row += 1
+
+            self.new_sheet.cell(row=row, column=2, value=f'+ = Multicast and embedded honors class').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
+            self.new_sheet.cell(row=row, column=6, value=f'Σ = Clarkston').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            row += 1
+
+            self.new_sheet.cell(row=row, column=6, value=f'∆ = Decatur').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            row += 1
+
+            self.new_sheet.cell(row=row, column=6, value=f'λ = Dunwoody').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            row += 1
+
+            self.new_sheet.cell(row=row, column=6, value=f'Ω = Newton').border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            row += 1
+
+        # Creates list of all numbers that need to be summed
+        act_sum = [f'=SUM(I6:I{self.alp_row})', f'=SUM(I43:I{self.clk_row})', f'=SUM(I81:I{self.dec_row})',
+                   f'=SUM(I119:I{self.dun_row})', f'=SUM(I157:I{self.newt_row})', f'=SUM(I196:I{self.onl_row})']
+        cap_sum = [f'=SUM(J6:J{self.alp_row})', f'=SUM(J43:J{self.clk_row})', f'=SUM(J81:J{self.dec_row})',
+                   f'=SUM(J119:J{self.dun_row})', f'=SUM(J157:J{self.newt_row})', f'=SUM(J196:J{self.onl_row})']
+        # Used to index through list of numbers that need to be summed
+        sum_index = 0
+
+        # Adds to total act and cap to each campus complete w/ borders
+        for row in [self.alp_row + 1, self.clk_row + 1, self.dec_row + 1, self.dun_row + 1, self.newt_row + 1,
+                    self.onl_row + 1]:
+            self.new_sheet.cell(row=row, column=8, value='Total').border = Border(left=Side(style='thin'),
+                                                                                  right=Side(style='thin'),
+                                                                                  top=Side(style='thin'),
+                                                                                  bottom=Side(style='thin'))
+
+            self.new_sheet.cell(row=row, column=9, value=act_sum[sum_index]).border = Border(left=Side(style='thin'),
+                                                                                             right=Side(style='thin'),
+                                                                                             top=Side(style='thin'),
+                                                                                             bottom=Side(style='thin'))
+
+            self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = Border(left=Side(style='thin'),
+                                                                                              right=Side(style='thin'),
+                                                                                              top=Side(style='thin'),
+                                                                                              bottom=Side(style='thin'))
+            sum_index += 1
 
         self.book.save('Fall Schedule March 25th copy.xlsx')
 
