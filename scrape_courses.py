@@ -43,6 +43,11 @@ class Courses:
     col_prof = 18
     col_location = 20
 
+    # Sets repetitive border styles
+    regular_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    legend_border = Border(left=Side(style='thin'), right=Side(style='thin'))
+    bottom_legend_border = Border(left=Side(style='thin'), right=Side(style='thin'), bottom=Side(style='thin'))
+
     def create_new_sheet(self):
         # Creates new sheet
         self.today = date.today().strftime('%m-%d-%Y')
@@ -315,8 +320,7 @@ class Courses:
                 max_column = self.new_sheet.max_column - 1
             for column in range(self.new_sheet.min_column, max_column):
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
-                self.new_sheet[coordinate].border = Border(left=Side(style='thin'), right=Side(style='thin'),
-                                                           top=Side(style='thin'), bottom=Side(style='thin'))
+                self.new_sheet[coordinate].border = self.regular_border
 
         # List of header rows
         header_rows = [5, 42, 80, 118, 156, 195]
@@ -328,55 +332,29 @@ class Courses:
                          self.onl_row + 2]
 
         for row in footer_tables:
-            self.new_sheet.cell(row=row, column=2, value=f'Course ID Legend').border = Border(left=Side(style='thick'),
-                                                                                              right=Side(style='thick'),
-                                                                                              top=Side(style='thick'),
-                                                                                              bottom=Side(style='thick'))
+            self.new_sheet.cell(row=row, column=2, value=f'Course ID Legend').border = self.regular_border
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
-            self.new_sheet.cell(row=row, column=6, value=f'Host Campus for Multicast Courses').border = Border(left=Side(style='thick'),
-                                                                                              right=Side(style='thick'),
-                                                                                              top=Side(style='thick'),
-                                                                                              bottom=Side(style='thick'))
+            self.new_sheet.cell(row=row, column=6, value=f'Host Campus for Multicast Courses').border = self.regular_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=2, value=f'* = Embedded honors class').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=2, value=f'* = Embedded honors class').border = self.legend_border
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
-            self.new_sheet.cell(row=row, column=6, value=f'α = Alpharetta').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=6, value=f'α = Alpharetta').border = self.legend_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=2, value=f'+ = Multicast and embedded honors class').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=2, value=f'+ = Multicast and embedded honors class').border = \
+                self.bottom_legend_border
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
-            self.new_sheet.cell(row=row, column=6, value=f'Σ = Clarkston').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=6, value=f'Σ = Clarkston').border = self.legend_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=6, value=f'∆ = Decatur').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=6, value=f'∆ = Decatur').border = self.legend_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=6, value=f'λ = Dunwoody').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=6, value=f'λ = Dunwoody').border = self.legend_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=6, value=f'Ω = Newton').border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=6, value=f'Ω = Newton').border = self.bottom_legend_border
             row += 1
 
         # Creates list of all numbers that need to be summed
@@ -390,20 +368,11 @@ class Courses:
         # Adds to total act and cap to each campus complete w/ borders
         for row in [self.alp_row + 1, self.clk_row + 1, self.dec_row + 1, self.dun_row + 1, self.newt_row + 1,
                     self.onl_row + 1]:
-            self.new_sheet.cell(row=row, column=8, value='Total').border = Border(left=Side(style='thin'),
-                                                                                  right=Side(style='thin'),
-                                                                                  top=Side(style='thin'),
-                                                                                  bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=8, value='Total').border = self.regular_border
 
-            self.new_sheet.cell(row=row, column=9, value=act_sum[sum_index]).border = Border(left=Side(style='thin'),
-                                                                                             right=Side(style='thin'),
-                                                                                             top=Side(style='thin'),
-                                                                                             bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=9, value=act_sum[sum_index]).border = self.regular_border
 
-            self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = Border(left=Side(style='thin'),
-                                                                                              right=Side(style='thin'),
-                                                                                              top=Side(style='thin'),
-                                                                                              bottom=Side(style='thin'))
+            self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = self.regular_border
             sum_index += 1
 
         self.book.save('Fall Schedule March 25th copy.xlsx')
