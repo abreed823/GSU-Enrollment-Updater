@@ -95,7 +95,7 @@ class PageTwo:
         course_type.select_by_value('HP')
 
     # Automatically selects appropriate criteria to filter class list
-    def filter_classes(self):
+    def filter_classes(self, file):
         self.select_degree()
         self.select_subjects()
         self.select_campus()
@@ -108,5 +108,5 @@ class PageTwo:
         # Defines html source code and passes it to scrape_courses.py which creates soup object
         html = driver.page_source
         page_3 = scrape_courses.Courses()
-        page_3.create_data_frame(html)
+        page_3.create_data_frame(html, file)
 

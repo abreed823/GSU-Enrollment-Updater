@@ -5,13 +5,6 @@ from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
 from datetime import date
 from itertools import chain
 
-# -TODO-
-# Add proper formatting (i.e. cell outlines, titles, legends, etc.)
-# For long last name on ALP, make it split into two lines at first initial if it exceeds a certain # of characters
-# Issue - if internet goes out during scrape, file is corrupt
-# Figure out page breaks
-# Tag campuses and left align after full center align
-
 
 class Courses:
     today = None
@@ -48,12 +41,12 @@ class Courses:
     legend_border = Border(left=Side(style='thin'), right=Side(style='thin'))
     bottom_legend_border = Border(left=Side(style='thin'), right=Side(style='thin'), bottom=Side(style='thin'))
 
-    def create_new_sheet(self):
+    def create_new_sheet(self, file):
         # Creates new sheet
         self.today = date.today().strftime('%m-%d-%Y')
-        self.book = load_workbook('Fall Schedule March 25th copy.xlsx')
+        self.book = load_workbook(file)
         self.book.create_sheet('NEW TEST SHEET ' + self.today)
-        self.book.save('Fall Schedule March 25th copy.xlsx')
+        self.book.save(file)
         self.new_sheet = self.book.worksheets[-1]
 
         # Sets sheet column widths
@@ -209,8 +202,8 @@ class Courses:
         # print('Row constructed successfully!')
 
     # Creates data frame and pushes df data to add_data method
-    def create_data_frame(self, html_source):
-        self.create_new_sheet()
+    def create_data_frame(self, html_source, file):
+        self.create_new_sheet(file)
         # Pulls second to last table from site
         # 'header=0' allows my to properly label each column
         df = pd.read_html(html_source, header=0)[-2]
@@ -375,7 +368,7 @@ class Courses:
             self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = self.regular_border
             sum_index += 1
 
-        self.book.save('Fall Schedule March 25th copy.xlsx')
+        self.book.save(file)
 
         # *****NOTE - DO NOT DELETE***** This block of code puts data frame into sheet.
         # This does not need to happen every time I run the program while testing, so it is commented out
