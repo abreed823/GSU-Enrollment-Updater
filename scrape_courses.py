@@ -193,8 +193,8 @@ class Courses:
                 formatted_name = f'{first_initial}. {last_name}'
                 self.new_sheet.cell(row=row_type, column=8, value=formatted_name[0:-4].upper())
 
-    # Creates data frame and pushes df data to add_data method
-    def create_data_frame(self, html_source, file):
+    # Organizes the data from the data frame that will be added to the spreadsheet
+    def organize_data(self, html_source, file):
         self.create_new_sheet(file)
         # Pulls second to last table from site
         # 'header=0' allows my to properly label each column
@@ -279,6 +279,8 @@ class Courses:
             # else:
             #     print(f'I am not a row. Index: {i}')
 
+    # Adds necessary formatting to cells
+    def format_cells(self):
         # Sets alignment for every cell after sheet is created all at once
         for row in range(self.new_sheet.min_row, self.new_sheet.max_row + 8):
             self.new_sheet.row_dimensions[row].height = 14.25
@@ -288,7 +290,8 @@ class Courses:
 
         # Sets size for specific cells in sheet all at once
         for row in list(chain(range(6, self.alp_row + 1), range(43, self.clk_row + 1), range(81, self.dec_row + 1),
-                              range(119, self.dun_row + 1), range(157, self.newt_row + 1), range(196, self.onl_row + 1))):
+                              range(119, self.dun_row + 1), range(157, self.newt_row + 1),
+                              range(196, self.onl_row + 1))):
             coordinate = self.new_sheet.cell(row=row, column=6).coordinate
             self.new_sheet[coordinate].font = Font(name='Arial', size=8)
 
@@ -298,7 +301,8 @@ class Courses:
 
         # Sets borders for all cells in tables
         for row in list(chain(range(5, self.alp_row + 1), range(42, self.clk_row + 1), range(80, self.dec_row + 1),
-                              range(118, self.dun_row + 1), range(156, self.newt_row + 1), range(195, self.onl_row + 1))):
+                              range(118, self.dun_row + 1), range(156, self.newt_row + 1),
+                              range(195, self.onl_row + 1))):
             if row < 195:
                 max_column = self.new_sheet.max_column + 1
             else:
@@ -307,19 +311,22 @@ class Courses:
                 coordinate = self.new_sheet.cell(row=row, column=column).coordinate
                 self.new_sheet[coordinate].border = self.regular_border
 
+    # Adds proper headers and footers to each campus
+    def headers_footers(self):
         # List of header rows
         header_rows = [5, 42, 80, 118, 156, 195]
         for row in header_rows:
             for column in range(self.new_sheet.min_column, self.new_sheet.max_column + 1):
                 self.new_sheet.row_dimensions[row].height = 21
 
-        footer_tables = [self.alp_row + 2, self.clk_row + 2, self.dec_row + 2, self.dun_row + 2, self. newt_row + 2,
+        footer_tables = [self.alp_row + 2, self.clk_row + 2, self.dec_row + 2, self.dun_row + 2, self.newt_row + 2,
                          self.onl_row + 2]
 
         for row in footer_tables:
             self.new_sheet.cell(row=row, column=2, value=f'Course ID Legend').border = self.regular_border
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
-            self.new_sheet.cell(row=row, column=6, value=f'Host Campus for Multicast Courses').border = self.regular_border
+            self.new_sheet.cell(row=row, column=6,
+                                value=f'Host Campus for Multicast Courses').border = self.regular_border
             row += 1
 
             self.new_sheet.cell(row=row, column=2, value=f'* = Embedded honors class').border = self.legend_border
@@ -327,7 +334,7 @@ class Courses:
             self.new_sheet.cell(row=row, column=6, value=f'α = Alpharetta').border = self.legend_border
             row += 1
 
-            self.new_sheet.cell(row=row, column=2, value=f'+ = Multicast and embedded honors class').border = \
+            self.new_sheet.cell(row=row, column=2, value=f'+ = Multicast & embedded honors class').border = \
                 self.bottom_legend_border
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=5)
             self.new_sheet.cell(row=row, column=6, value=f'Σ = Clarkston').border = self.legend_border
@@ -342,6 +349,8 @@ class Courses:
             self.new_sheet.cell(row=row, column=6, value=f'Ω = Newton').border = self.bottom_legend_border
             row += 1
 
+    # Sums number of students and seats in each class and campus
+    def add_sums(self):
         # Creates list of all numbers that need to be summed
         act_sum = [f'=SUM(I6:I{self.alp_row})', f'=SUM(I43:I{self.clk_row})', f'=SUM(I81:I{self.dec_row})',
                    f'=SUM(I119:I{self.dun_row})', f'=SUM(I157:I{self.newt_row})', f'=SUM(I196:I{self.onl_row})']
@@ -359,6 +368,14 @@ class Courses:
 
             self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = self.regular_border
             sum_index += 1
+
+    # Calls all necessary functions required to update enrollment spreadsheet
+    def update_spreadsheet(self, html_source, file):
+
+        self.organize_data(html_source, file)
+        self.format_cells()
+        self.headers_footers()
+        self.add_sums()
 
         self.book.save(file)
 
