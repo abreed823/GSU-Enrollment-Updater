@@ -270,14 +270,14 @@ class Courses:
                     else:
                         self.onl_row += 1
                         row_type = self.onl_row
-                    print(f'Success: Index: {i}')
+                    # print(f'Success: Index: {i}')
                     self.add_data(int(crn), subj, class_name, sec, int(float(class_credits)), title, days, class_time,
                                   int(cap), int(act), comments, prof,
                                   location, row_type, campus)
-                else:
-                    print(f'Error: Class not found. Index: {i}')
-            else:
-                print(f'I am not a row. Index: {i}')
+            #     else:
+            #         print(f'Error: Class not found. Index: {i}')
+            # else:
+            #     print(f'I am not a row. Index: {i}')
 
         # Sets alignment for every cell after sheet is created all at once
         for row in range(self.new_sheet.min_row, self.new_sheet.max_row + 8):

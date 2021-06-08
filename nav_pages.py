@@ -1,20 +1,22 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import time
 import scrape_courses
 
+chrome_options = Options()
+chrome_options.add_argument("--headless")
 base_url = 'https://www.gosolar.gsu.edu/bprod/bwckschd.p_disp_dyn_sched'
-driver = webdriver.Chrome('/Users/aprilbreedlove/Downloads/PythonGSU/chromedriver')
-driver.maximize_window()
-driver.get(base_url)
-driver.implicitly_wait(10)
+driver = webdriver.Chrome('/Users/aprilbreedlove/Downloads/PythonGSU/chromedriver', chrome_options=chrome_options)
 
 
 # Functions that operate on the landing page
 class PageOne:
     def select_term(self):
+        driver.get(base_url)
+        driver.implicitly_wait(10)
         semester_menu = driver.find_element_by_name('p_term')
         semester = Select(semester_menu)
 
@@ -99,4 +101,3 @@ class PageTwo:
         html = driver.page_source
         page_3 = scrape_courses.Courses()
         page_3.create_data_frame(html, file)
-
