@@ -45,7 +45,7 @@ class Courses:
         # Creates new sheet
         self.today = date.today().strftime('%m-%d-%Y')
         self.book = load_workbook(file)
-        self.book.create_sheet('NEW TEST SHEET ' + self.today)
+        self.book.create_sheet('Updated ' + self.today)
         self.book.save(file)
         self.new_sheet = self.book.worksheets[-1]
 
@@ -63,7 +63,6 @@ class Courses:
         self.new_sheet.column_dimensions['K'].width = 9.83
         self.new_sheet.column_dimensions['L'].width = 17
 
-        # list(chain(range(1, 5), range(40, 44), range(78, 82), range(116, 120), range(156, 160), range(195, 199)))
         # Appends proper headings to each campus
         for row in [1, 38, 76, 114, 152, 191]:
             self.new_sheet.cell(row=row, column=6, value='Perimeter College').font = Font(bold=True)
@@ -193,13 +192,6 @@ class Courses:
                     last_name = hyphenated_name[-1]
                 formatted_name = f'{first_initial}. {last_name}'
                 self.new_sheet.cell(row=row_type, column=8, value=formatted_name[0:-4].upper())
-
-        # The faster less brute-force version if I can get it to work
-        # I need it to be able to add the list of values to specific rows, not just to the end of the sheet
-        # new_row = [crn, subj, class_name, sec, campus, class_credits, title, days, class_time, cap, act, prof, location]
-        # self.new_sheet[self.row].value = new_row
-        # self.row += 1
-        # print('Row constructed successfully!')
 
     # Creates data frame and pushes df data to add_data method
     def create_data_frame(self, html_source, file):
@@ -370,7 +362,7 @@ class Courses:
 
         self.book.save(file)
 
-        # *****NOTE - DO NOT DELETE***** This block of code puts data frame into sheet.
+        # *****NOTE - DO NOT DELETE***** This block of code puts data frame into sheet for testing purposes.
         # This does not need to happen every time I run the program while testing, so it is commented out
         # .................................................................................
         # # Appends dataframe to existing sheet via mode='a'

@@ -54,16 +54,6 @@ class PageTwo:
             .key_up(Keys.SHIFT)\
             .perform()
 
-        # *** OLD VERSION OF THIS FUNCTION ***
-        # # Adds all options from menu to a list
-        # subject_menu = driver.find_element_by_id('subj_id')
-        # subject = Select(subject_menu)
-        # subject_options = [x for x in subject_menu.find_elements_by_tag_name('option')]
-        # # Iterates through every options and selects it
-        # for element in subject_options:
-        #     value = element.get_attribute('value')
-        #     subject.select_by_value(value)
-
     # Selects the six campuses
     def select_campus(self):
         campus_menu = driver.find_element_by_id('camp_id')
