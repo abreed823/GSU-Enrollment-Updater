@@ -1,7 +1,7 @@
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, Border, Side
-from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
+# from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
 from datetime import date
 from itertools import chain
 
@@ -14,11 +14,11 @@ class Courses:
 
     # Declares starting rows for each campus
     alp_row = 5
-    clk_row = 42
-    dec_row = 80
-    dun_row = 118
-    newt_row = 156
-    onl_row = 195
+    clk_row = 49
+    dec_row = 95
+    dun_row = 140
+    newt_row = 185
+    onl_row = 231
 
     # Defines column of each piece of data in data frame
     col_crn = 2
@@ -36,10 +36,23 @@ class Courses:
     col_prof = 18
     col_location = 20
 
-    # Sets repetitive border styles
-    regular_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    # Sets border styles
+    regular_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
+                            bottom=Side(style='thin'))
     legend_border = Border(left=Side(style='thin'), right=Side(style='thin'))
     bottom_legend_border = Border(left=Side(style='thin'), right=Side(style='thin'), bottom=Side(style='thin'))
+    college_totals_topleft = Border(left=Side(style='thick'), right=Side(style='thin'), top=Side(style='thick'),
+                                    bottom=Side(style='thin'))
+    college_totals_topmiddle = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thick'),
+                                      bottom=Side(style='thin'))
+    college_totals_topright = Border(left=Side(style='thin'), right=Side(style='thick'), top=Side(style='thick'),
+                                     bottom=Side(style='thin'))
+    college_totals_bottomleft = Border(left=Side(style='thick'), right=Side(style='thin'), top=Side(style='thin'),
+                                       bottom=Side(style='thick'))
+    college_totals_bottommiddle = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
+                                         bottom=Side(style='thick'))
+    college_totals_bottomright = Border(left=Side(style='thin'), right=Side(style='thick'), top=Side(style='thin'),
+                                        bottom=Side(style='thick'))
 
     def create_new_sheet(self, file):
         # Creates new sheet
@@ -64,7 +77,7 @@ class Courses:
         self.new_sheet.column_dimensions['L'].width = 17
 
         # Appends proper headings to each campus
-        for row in [1, 38, 76, 114, 152, 191]:
+        for row in [1, 45, 91, 136, 181, 227]:
             self.new_sheet.cell(row=row, column=6, value='Perimeter College').font = Font(bold=True)
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=6, end_column=8)
             row += 1
@@ -86,7 +99,7 @@ class Courses:
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=11, end_column=12)
 
         # Table headers
-        for row in [5, 42, 80, 118, 156, 195]:
+        for row in [5, 49, 95, 140, 185, 231]:
 
             self.new_sheet.cell(row=row, column=2, value='CRN').font = Font(size=9, bold=True)
             self.new_sheet.cell(row=row, column=3, value='COURSE ID').font = Font(size=9, bold=True)
@@ -96,7 +109,7 @@ class Courses:
             self.new_sheet.cell(row=row, column=7, value='DAY').font = Font(size=9, bold=True)
 
             # Makes the headers appropriately different for the Online Campus
-            if row != 195:
+            if row != 231:
                 self.new_sheet.cell(row=row, column=8, value='TIME').font = Font(size=9, bold=True)
                 self.new_sheet.cell(row=row, column=9, value='ACT').font = Font(size=9, bold=True)
                 self.new_sheet.cell(row=row, column=10, value='CAP').font = Font(size=9, bold=True)
@@ -109,12 +122,12 @@ class Courses:
 
         # Adds campus names to sheet
         self.new_sheet.cell(row=4, column=2, value='ALPHARETTA CAMPUS').font = Font(size=9, bold=True)
-        self.new_sheet.cell(row=41, column=2, value='CLARKSTON CAMPUS').font = Font(size=9, bold=True)
-        self.new_sheet.cell(row=79, column=2, value='DECATUR CAMPUS').font = Font(size=9, bold=True)
-        self.new_sheet.cell(row=117, column=2, value='DUNWOODY CAMPUS').font = Font(size=9, bold=True)
-        self.new_sheet.cell(row=155, column=2, value='NEWTON CAMPUS').font = Font(size=9, bold=True)
-        self.new_sheet.cell(row=194, column=2, value='ONLINE CAMPUS').font = Font(size=9, bold=True)
-        for row in (4, 41, 79, 117, 155, 194):
+        self.new_sheet.cell(row=48, column=2, value='CLARKSTON CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=94, column=2, value='DECATUR CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=139, column=2, value='DUNWOODY CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=184, column=2, value='NEWTON CAMPUS').font = Font(size=9, bold=True)
+        self.new_sheet.cell(row=230, column=2, value='ONLINE CAMPUS').font = Font(size=9, bold=True)
+        for row in (4, 48, 94, 139, 184, 230):
             self.new_sheet.merge_cells(start_row=row, end_row=row, start_column=2, end_column=4)
 
     # Checks each row to make sure it has class data
@@ -289,9 +302,9 @@ class Courses:
                 self.new_sheet[coordinate].alignment = Alignment(horizontal='center')
 
         # Sets size for specific cells in sheet all at once
-        for row in list(chain(range(6, self.alp_row + 1), range(43, self.clk_row + 1), range(81, self.dec_row + 1),
-                              range(119, self.dun_row + 1), range(157, self.newt_row + 1),
-                              range(196, self.onl_row + 1))):
+        for row in list(chain(range(6, self.alp_row + 1), range(50, self.clk_row + 1), range(96, self.dec_row + 1),
+                              range(141, self.dun_row + 1), range(186, self.newt_row + 1),
+                              range(232, self.onl_row + 1))):
             coordinate = self.new_sheet.cell(row=row, column=6).coordinate
             self.new_sheet[coordinate].font = Font(name='Arial', size=8)
 
@@ -300,10 +313,10 @@ class Courses:
                 self.new_sheet[coordinate].font = Font(name='Arial', size=9)
 
         # Sets borders for all cells in tables
-        for row in list(chain(range(5, self.alp_row + 1), range(42, self.clk_row + 1), range(80, self.dec_row + 1),
-                              range(118, self.dun_row + 1), range(156, self.newt_row + 1),
-                              range(195, self.onl_row + 1))):
-            if row < 195:
+        for row in list(chain(range(5, self.alp_row + 1), range(49, self.clk_row + 1), range(95, self.dec_row + 1),
+                              range(140, self.dun_row + 1), range(185, self.newt_row + 1),
+                              range(231, self.onl_row + 1))):
+            if row < 231:
                 max_column = self.new_sheet.max_column + 1
             else:
                 max_column = self.new_sheet.max_column - 1
@@ -314,7 +327,7 @@ class Courses:
     # Adds proper headers and footers to each campus
     def headers_footers(self):
         # List of header rows
-        header_rows = [5, 42, 80, 118, 156, 195]
+        header_rows = [5, 49, 95, 140, 185, 231]
         for row in header_rows:
             for column in range(self.new_sheet.min_column, self.new_sheet.max_column + 1):
                 self.new_sheet.row_dimensions[row].height = 21
@@ -352,10 +365,10 @@ class Courses:
     # Sums number of students and seats in each class and campus
     def add_sums(self):
         # Creates list of all numbers that need to be summed
-        act_sum = [f'=SUM(I6:I{self.alp_row})', f'=SUM(I43:I{self.clk_row})', f'=SUM(I81:I{self.dec_row})',
-                   f'=SUM(I119:I{self.dun_row})', f'=SUM(I157:I{self.newt_row})', f'=SUM(I196:I{self.onl_row})']
-        cap_sum = [f'=SUM(J6:J{self.alp_row})', f'=SUM(J43:J{self.clk_row})', f'=SUM(J81:J{self.dec_row})',
-                   f'=SUM(J119:J{self.dun_row})', f'=SUM(J157:J{self.newt_row})', f'=SUM(J196:J{self.onl_row})']
+        act_sum = [f'=SUM(I6:I{self.alp_row})', f'=SUM(I50:I{self.clk_row})', f'=SUM(I96:I{self.dec_row})',
+                   f'=SUM(I141:I{self.dun_row})', f'=SUM(I186:I{self.newt_row})', f'=SUM(I232:I{self.onl_row})']
+        cap_sum = [f'=SUM(J6:J{self.alp_row})', f'=SUM(J50:J{self.clk_row})', f'=SUM(J96:J{self.dec_row})',
+                   f'=SUM(J141:J{self.dun_row})', f'=SUM(J186:J{self.newt_row})', f'=SUM(J232:J{self.onl_row})']
         # Used to index through list of numbers that need to be summed
         sum_index = 0
 
@@ -368,6 +381,18 @@ class Courses:
 
             self.new_sheet.cell(row=row, column=10, value=cap_sum[sum_index]).border = self.regular_border
             sum_index += 1
+
+        # College Totals
+        total_act = f'=SUM(I{self.alp_row + 1}, I{self.clk_row + 1}, I{self.dec_row + 1}, I{self.dun_row + 1}, ' \
+                    f'I{self.newt_row + 1}, I{self.onl_row + 1})'
+        total_cap = f'=SUM(J{self.alp_row + 1}, J{self.clk_row + 1}, J{self.dec_row + 1}, J{self.dun_row + 1}, ' \
+                    f'J{self.newt_row + 1}, J{self.onl_row + 1})'
+        self.new_sheet.cell(row=self.onl_row + 6, column=8).border = self.college_totals_topleft
+        self.new_sheet.cell(row=self.onl_row + 6, column=9, value='ACT').border = self.college_totals_topmiddle
+        self.new_sheet.cell(row=self.onl_row + 6, column=10, value='CAP').border = self.college_totals_topright
+        self.new_sheet.cell(row=self.onl_row + 7, column=8, value='College Totals').border = self.college_totals_bottomleft
+        self.new_sheet.cell(row=self.onl_row + 7, column=9, value=total_act).border = self.college_totals_bottommiddle
+        self.new_sheet.cell(row=self.onl_row + 7, column=10, value=total_cap).border = self.college_totals_bottomright
 
     # Calls all necessary functions required to update enrollment spreadsheet
     def update_spreadsheet(self, html_source, file):
