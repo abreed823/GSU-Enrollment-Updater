@@ -1,7 +1,9 @@
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, Border, Side
-# from openpyxl.worksheet.pagebreak import RowBreak, ColBreak
+from openpyxl.worksheet.pagebreak import Break
+from openpyxl.worksheet.properties import PageSetupProperties
+from openpyxl.worksheet.worksheet import Worksheet
 from datetime import date
 from itertools import chain
 
@@ -406,6 +408,11 @@ class Courses:
         self.new_sheet.cell(row=self.onl_row + 7, column=9, value=total_act).border = self.college_totals_bottommiddle
         self.new_sheet.cell(row=self.onl_row + 7, column=10, value=total_cap).border = self.college_totals_bottomright
 
+    def add_page_breaks(self):
+        page_break_rows = [44, 90, 135, 180, 226, 262]
+        for row in page_break_rows:
+            self.new_sheet.row_breaks.append(Break(id=row))
+
     # Calls all necessary functions required to update enrollment spreadsheet
     def update_spreadsheet(self, html_source, file):
 
@@ -413,6 +420,7 @@ class Courses:
         self.format_cells()
         self.headers_footers()
         self.add_sums()
+        self.add_page_breaks()
 
         self.book.save(file)
 
