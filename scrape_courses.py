@@ -146,7 +146,19 @@ class Courses:
             if cap < 19 and cap != 9 and 'MultiCast' not in comments:
                 self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}*')
             elif 'MultiCast' in comments:
-                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+')
+                host_campus_key = ''
+                if 'from Alpharetta Campus' in comments:
+                    host_campus_key = 'α'
+                elif 'from Clarkston Campus' in comments:
+                    host_campus_key = 'Σ'
+                elif 'from Decatur Campus' in comments:
+                    host_campus_key = '∆'
+                elif 'from Dunwoody Campus' in comments:
+                    host_campus_key = 'λ'
+                elif 'from Newton Campus' in comments:
+                    host_campus_key = 'Ω'
+
+                self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}+{host_campus_key}')
             else:
                 self.new_sheet.cell(row=row_type, column=4, value=f'{class_name}-{sec}')
 
