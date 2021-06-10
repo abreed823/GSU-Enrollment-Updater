@@ -65,7 +65,8 @@ def upload():
             root.update()
 
             # Randomly plays one of five songs
-            song_list = ['elevator.mp3', 'sweet.mp3', 'hipjazz.mp3', 'smile.mp3', 'sunny.mp3']
+            song_list = ['./songs/elevator.mp3', './songs/sweet.mp3', './songs/hipjazz.mp3', './songs/smile.mp3',
+                         './songs/sunny.mp3']
             pygame.mixer.music.load(random.choice(song_list))
             pygame.mixer.music.play(loops=0)
 
@@ -77,7 +78,6 @@ def upload():
 
             page_2 = nav_pages.PageTwo()
             page_2.filter_classes(file_path)
-            # page_2.close_browser()
 
             # Displayed when update process is finished
             main_label.config(text='File update complete.'
@@ -102,7 +102,3 @@ main_button.pack(pady=(75, 0))
 
 root.configure(bg='#F0FBFD')
 root.mainloop()
-
-# Sample color codes
-# #900C3F Brighter Red
-# #581845 Darker Red

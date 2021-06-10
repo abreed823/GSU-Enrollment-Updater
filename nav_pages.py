@@ -9,7 +9,7 @@ import scrape_courses
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 base_url = 'https://www.gosolar.gsu.edu/bprod/bwckschd.p_disp_dyn_sched'
-driver = webdriver.Chrome('/Users/aprilbreedlove/Downloads/PythonGSU/chromedriver', chrome_options=chrome_options)
+driver = webdriver.Chrome('./driver/chromedriver', chrome_options=chrome_options)
 
 
 # Functions that operate on the landing page
